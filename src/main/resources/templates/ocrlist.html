@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${title}"></title>
+  <script type="text/javascript" th:src="@{/js/jquery-3.5.1.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/jquery-ui.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/jquery.tablesorter.combined.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/extras/jquery.tablesorter.pager.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/widgets/widget-scroller.min.js}"></script>
+<!--   <script type="text/javascript" src="js/jquery.ui.datepicker-ja.min.js"></script> -->
+  <link rel="stylesheet" th:href="@{/css/theme.blue.css}">
+  <link rel="stylesheet" th:href="@{/css/jquery-ui.css}">
+  <script type="text/javascript">
+    $(document).ready(function() {
+    	$("table").tablesorter({
+			theme: 'blue',
+			widthFixed: true,
+			//zebra:1行ごとに色を変える
+			//columns:選択した列の色を変える
+			//filter:列にフィルタ機能を追加する
+			//resizable:列のリサイズをする
+			//stickyHeaders:スクロールの際にヘッダを固定する	????
+			//scroller:ヘッダを固定
+            //widgets: ['zebra', 'columns', 'filter', 'pager', 'resizable', 'stickyHeaders'],
+			widgets: ['zebra', 'columns', 'resizable', 'pager', 'sticyHeaders', 'scroller'],
+	        widgetOptions: {
+	            // テーブルの髙さの指定
+	            scroller_height : 500
+	        }
+		});
+		$("table").tablesorterPager({
+			container: $(".pager"),
+		});
+	});
+  	$(function() {
+		$(".datepicker").datepicker();
+	});
+  </script>
+  <style>
+    html,body {
+        font-family:sans-serif;
+    }
+    header {
+    	background: #333;
+    	color: #fff;
+    	padding: .5rem;
+		font-size: 1.5rem;
+		text-align: left;
+    }
+    #aa {
+    	color: #fff;
+		text-decoration: none;
+		white-space: nowrap;
+    }
+    li {
+		margin: 2rem 0;
+    }
+	/*ボタン*/
+    .btn-menu {
+    	border: 1px solid #999;
+		background: transparent;
+    	color: #fff;
+    	padding: .5rem 1rem;
+		cursor: pointer;
+		line-height: 1;
+    }
+	/*メニュー*/
+	nav {
+		background: #0bd;
+		position: absolute;
+		z-index: 1;
+		top: 3.125rem;
+		left: 0;
+		overflow-x: hidden;
+		text-align: center;
+		width: 0;
+		transition: .1s;
+	}
+	/*メニューを開いたとき*/
+	nav.open-menu {
+		width: 20%;
+	}
+	chuui {
+		font-weight: bold;	/* 太字 */
+		color: #FF0000; 	/* 赤字 */
+	}
+  </style>
+</head>
+<body>
+  <header>
+  	<button class="btn-menu" id="btn-menu">メニュー</button>
+  	<nav>
+  		<ul>
+  			<li><a href="/ocr/list" id="aa">OCR管理表</a>
+  			<li><a href="/fax" id="aa">FAX管理表</a>
+  			<li><a href="/daicho" id="aa">Daicho管理表</a>
+  		</ul>
+  	</nav>
+  	<label th:text="${title}"></label>
+  </header>
+  <script type="text/javascript">
+  	const btn = document.querySelector('.btn-menu');
+  	const nav = document.querySelector('nav');
+
+  	btn.addEventListener('click', btnClick, false);
+  	function btnClick() {
+  	  	nav.classList.toggle('open-menu');
+  	  	if (btn.innerHTML == 'メニュー') {
+  	  	  	btn.innerHTML = '閉じる';
+  	  	} else {
+  	  	  	btn.innerHTML = 'メニュー';
+  	  	}
+  	};
+  </script>
+  <form action=ocr/list method="post">
+     帳票名: <input type="text" name="form">
+     日付:  <input type="date" name="date_fr">～<input type="date" name="date_to">
+     <button type="submit">検索</button><br>
+     <chuui>IEサポート終了に伴い...</chuui>
+  </form>
+  <div id="pager" class="pager">
+    <button type="button" class="first"><<</button>
+    <button type="button" class="prev"><</button>
+    <span class="pagedisplay"></span>
+    <button type="button" class="next">></button>
+    <button type="button" class="last">>></button>
+    <select class="pagesize" title="Select page size">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+    </select>
+    <select class="gotoPage" title="Select page number"></select>
+  </div>
+  <table id="table" class="tablesorter">	 <!--tablesorter-blue-->
+  	<thead><tr align=center>
+   		<th style="font-size: 11pt;">ID</th>
+  		<th style="font-size: 11pt;">帳票</th>
+  		<th style="font-size: 11pt;">ステータス</th>
+  		<th style="font-size: 11pt;">日時</th>
+  		<th style="font-size: 11pt;">ファイルパス</th>
+  		<th style="font-size: 11pt;">OCR</th>
+  	</tr></thead>
+    <tbody><tr th:each="obj : ${list}">
+		<td><a th:href="${'/ocr/result?unitId=' + obj.unitId + '&type=0'}" target="_blank" th:text="${obj.unitId}"></a></td>
+		<td><a th:href="${'/ocr/result?unitId=' + obj.unitId + '&type=1'}" target="_blank" th:text="${obj.unitName}"></a></td>
+		<td th:text="${obj.status}"></td>
+		<td th:text="${obj.createdAt}"></td>
+		<td><a th:href="${obj.uploadFilePath}" target="_blank" th:text="${obj.uploadFilePath}"></a></td>
+		<td th:text="${obj.linkUrl != null}? 'OCR' : '-'"></td>
+  	</tr></tbody>
+  </table>
+</body>  
+</html>
