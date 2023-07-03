@@ -162,13 +162,17 @@ public class MyExcel {
 		boolean match = false;
 		//https://plus-idea.net/how_to_read_excel_java_apache_poi/#i-2
 		for (Row row2 : this.sheet) {
+			strValue = "";
 			cell = row2.getCell(colIdx);	//マッチング対象列を設定
-			//ctype = cell.getCellType();
-			if (cell.getStringCellValue() != null) {
-				strValue = cell.getStringCellValue();
+			ctype = cell.getCellType();
+			if (ctype == CellType.STRING) {
+				if (cell.getStringCellValue() != null) {
+					strValue = cell.getStringCellValue();
+					strValue = strValue.trim();	//前後に空白が入っていたら除去
+				} 
+			} else if (ctype == CellType.NUMERIC) {
+				strValue = String.valueOf(cell.getNumericCellValue());
 				strValue = strValue.trim();	//前後に空白が入っていたら除去
-			} else {
-				strValue = "";
 			}
 			if (strValue.equals(target) == true) {
 				match = true;
@@ -185,7 +189,7 @@ public class MyExcel {
 			} else {
 				strValue = "";
 			}
-			strValue = "00送信元なし";
+			strValue = "00送信元なし";		//固定設定
 		}
 		
 		return strValue;

@@ -64,11 +64,10 @@ public class InsourcingController {
 		String kyoten = config.getScanDefTgt2();
         System.out.println("kyoten: " + kyoten);
 		
-		ArrayList<FaxDataBean> list;
+		ArrayList<FaxDataBean> list = null;
 		try {
 	        list = FaxDataDAO.getInstance(config).read(null, null, null, null, kyoten);
 		} catch (SQLException e) {
-			list = null;
 			e.printStackTrace();
 		}
 		// 次の画面に値を渡す
@@ -82,7 +81,7 @@ public class InsourcingController {
     @PostMapping("/fax")
     public String faxPost(Model model, @RequestParam("form") String form, 
    			@RequestParam("date_fr") String date_fr, @RequestParam("date_to") String date_to, String soushimotonashi) {
-		String kyoten = "2FAX";
+		String kyoten = config.getScanDefTgt2();
         System.out.println("form: " + form);
         System.out.println("date_fr: " + date_fr);
         System.out.println("date_to: " + date_to);
@@ -91,11 +90,10 @@ public class InsourcingController {
 
 		String title = "FAXデータリスト";
 		
-		ArrayList<FaxDataBean> list;
+		ArrayList<FaxDataBean> list = null;
 		try {
 	        list = FaxDataDAO.getInstance(config).read(form, date_fr, date_to, soushimotonashi, kyoten);
 		} catch (SQLException e) {
-			list = null;
 			e.printStackTrace();
 		}
 		// 次の画面に値を渡す
@@ -110,11 +108,10 @@ public class InsourcingController {
     public String ocr(Model model){
 		String title = "OCR結果一覧表";
 		
-		ArrayList<OcrDataFormBean> list;
+		ArrayList<OcrDataFormBean> list = null;
 		try {
 	        list = OcrDataFormDAO.getInstance(config).read(null, null, null);
 		} catch (SQLException e) {
-			list = null;
 			e.printStackTrace();
 		}
 		// 次の画面に値を渡す
@@ -134,11 +131,10 @@ public class InsourcingController {
 
 		String title = "OCR結果一覧表";
 		
-		ArrayList<OcrDataFormBean> list;
+		ArrayList<OcrDataFormBean> list = null;
 		try {
 	        list = OcrDataFormDAO.getInstance(config).read(form, date_fr, date_to);
 		} catch (SQLException e) {
-			list = null;
 			e.printStackTrace();
 		}
 		// 次の画面に値を渡す
@@ -154,7 +150,6 @@ public class InsourcingController {
 			@RequestParam("type") int type) {
 		System.out.println("  unitId: " + unitId + "  type: " + type);
 
-        //System.out.println("unitStatus: " + unitStatus);      
 		String title = "OCR変換結果";
 		// 次の画面に値を渡す
 		model.addAttribute("title", title);
@@ -172,11 +167,10 @@ public class InsourcingController {
         //レスポンス
 		System.out.println("  unitId: " + unitId + "  type: " + type);
 		
-		ArrayList<OcrDataFormBean> dao;
+		ArrayList<OcrDataFormBean> dao = null;
 		try {
 	        dao = OcrDataFormDAO.getInstance(config).queryWithUnitId(unitId);
 		} catch (SQLException e) {
-			dao = null;
 			e.printStackTrace();
 			return null;
 		}

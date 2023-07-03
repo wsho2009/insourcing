@@ -106,7 +106,7 @@ public class OcrProcess {
 	public static void run(InsourcingConfig config) {
 		OcrProcess process = new OcrProcess(config);
     	scan1 = new FaxScanFile(config, SCAN_CLASS1); 
-		//new Thread(scan1).start();
+		new Thread(scan1).start();
     	scan2 = new FaxScanFile(config, SCAN_CLASS2); 
 		//new Thread(scan2).start();
     	scan3 = new PoScanFile(config); 
@@ -697,7 +697,7 @@ public class OcrProcess {
 		//---------------------------------------
         String csvFilePath = ocrData.outFolderPath + "\\" + ocrData.csvFileName;	//CSVファイルフルパス
         //既存ファイルがあれば削除
-		MyFiles.existDelete(csvFilePath);
+		MyFiles.existsDelete(csvFilePath);
         MyUtils.SystemLogPrint("  CSV file: " + csvFilePath);
 		//---------------------------------------
 		//HTTP request parametes
@@ -1291,7 +1291,7 @@ public class OcrProcess {
 			//CSVファイル（元ファイル）は削除
 			String csvFilePath = ocrData.outFolderPath + "\\" + ocrData.csvFileName;
 			MyUtils.SystemLogPrint("  CSVファイル削除: " + csvFilePath);
-			MyFiles.existDelete(csvFilePath);
+			MyFiles.existsDelete(csvFilePath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1410,7 +1410,7 @@ public class OcrProcess {
 		copyCmd[2] = "cat";
 		copyCmd[3] = ocrData.rotateInfo;	//回転あり
 		copyCmd[4] = "output";
-		copyCmd[5] = copyToFile.replace("\\\\", "\\");	//この変換の必要性については要確認！
+		copyCmd[5] = copyToFile;		//copyToFile.replace("\\\\", "\\");	//この変換の必要性については要確認！
 		System.out.print("  ");
 		for (String cmd : copyCmd)
 			System.out.print(cmd + " ");

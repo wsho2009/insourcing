@@ -153,8 +153,8 @@ public class FaxScanFile implements Runnable {
 		
 		String mailBody1 = "";
 		String mailBody2 = "";
-		String flag = "0";
-		String syubetsu = "";
+		String flag = "0";		//A列
+		String syubetsu = "";	//B列
 		//2 Excelオープン
     	try {
 			CellType ctype;
@@ -167,7 +167,6 @@ public class FaxScanFile implements Runnable {
 			MyUtils.SystemLogPrint("  Excelオープン..." + xlsPath);
 			// シートを取得
 			xlsx.setSheet("MAIL");
-			flag = "0"; 
 			//配信メール情報:From
 			mailConf.fmAddr = xlsx.getStringCellValue(1, 1);
 			//配信メール情報:Bcc
@@ -181,13 +180,7 @@ public class FaxScanFile implements Runnable {
 			//FAX送信元 検索
 			xlsx.setSheet("マスタ");
 			soshinMoto = xlsx.search(2, listfaxNo);	//結果をrowにセット。マッチしなければ最下行をセット。
-			xlsx.getCell(3);			//D列：SOSHIN_MOTO
-			if (xlsx.getStringCellValue() != null) {
-				soshinMoto = xlsx.getStringCellValue();
-				soshinMoto = soshinMoto.trim();		//前後に空白が入っていたら除去
-			} else {
-				soshinMoto = "";
-			}
+			MyUtils.SystemLogPrint("FAX番号から引き当てた送信元: " + soshinMoto);
 			xlsx.getCell(6);			//G列
 			mailConf.toAddr = xlsx.getStringCellValue();
 			xlsx.getCell(7);			//H列
@@ -238,27 +231,29 @@ public class FaxScanFile implements Runnable {
         //------------------------------------------------------
         //OCR登録処理(注文書)	★NEXTで、A,B列を変更する必要があり
         //------------------------------------------------------
-		if (flag.equals("1") == true) {
-			MyUtils.SystemLogPrint("  OCR登録...");
-			int type = -1;
-			if (this.kyoten.equals(this.SCAN_CLASS1) == true) {
-				type = 2;
-			} else if (this.kyoten.equals(this.SCAN_CLASS2) == true) {
-				type = 0;
-			} else {
-				return;
+		int type = -1;
+		if (this.kyoten.equals(this.SCAN_CLASS1) == true) {
+			type = 2;
+		} else if (this.kyoten.equals(this.SCAN_CLASS2) == true) {
+			type = 0;
+			if (syubetsu.equals("K注文書") == true) {
+				syubetsu = "注文書";
 			}
-			registOcrProcess(dstPath, type);
-			
+		} else {
 			return;
 		}
-		//注文書以外、番号登録あり
-		if (flag.equals("1") != true) {
-			//パターン①
+		//注文書以外、番号登録ありは、この時点でメール送信
+    	if( syubetsu.equals("注文書") != true && faxNo.equals("") != true) {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			mailConf.subject = "TEST " + this.kyoten + "送信連絡" + "("+ dateFormat.format(new Date()) + " " + soshinMoto + ")";
 			mailConf.attach = dstPath;
 			sendScanMail(this.kyoten);
+			
+			return;
+		} else {
+			//それ以外は、OCR登録のプロセス
+			MyUtils.SystemLogPrint("  OCR登録...");
+			registOcrProcess(dstPath, type);
 			
 			return;
 		}
@@ -371,15 +366,12 @@ public class FaxScanFile implements Runnable {
 			MyUtils.SystemLogPrint("  Excelオープン..." + xlsPath);
 			// シートを取得
 			xlsx.setSheet("MAIL");
-			flag = "0"; 
 			//配信メール情報:From
 			mailConf.fmAddr = xlsx.getStringCellValue(1, 1);
 			//配信メール情報:Bcc
 			mailConf.bccAddr = xlsx.getStringCellValue(4, 1);
 			//配信メール情報:Body1,2
 			mailBody1 = xlsx.getStringCellValue(6, 1);
-			xlsx.getCell(7);
-			xlsx.getCell(1);
 			mailBody2 = xlsx.getStringCellValue(7, 1);
 			mailConf.body = mailBody1 + "\n" + mailBody2 + "\n" + fileName + "\n";
 			
@@ -408,7 +400,7 @@ public class FaxScanFile implements Runnable {
     	    throw t;
     	}
 
-		//パターン①
+		//パターン①: 注文書のケース
 		mailConf.subject = "TEST " + ocrData.getDocSetName() + "送信連絡" + "(" + ocrData.getCreatedAt() + " " + ocrData.getUnitName() + ")";
 		mailConf.attach = pdfPath;
 		if (ocrData.getRenkeiResult().equals("") != true) {
@@ -480,21 +472,21 @@ public class FaxScanFile implements Runnable {
     	    throw t;
     	}
 
-		//パターンx
+		//パターン①: 仕分け後のケース
 		mailConf.subject = "TEST " + ocrData.getDocSetName() + "送信連絡" + "(" + ocrData.getCreatedAt() + " " + ocrData.getUnitName() + ")";
 		mailConf.attach = uploadFilePath;
 		if (readValue.equals("") == true) {
-			if (ocrData.getRenkeiResult().equals("") != true) {
+			if (ocrData.getRenkeiResult() != null) {
 				mailConf.body = mailConf.body + "\n<OCR読取り結果>\n" + ocrData.getRenkeiResult() + "\n";
-			} else if (ocrData.getCheckResult().equals("") != true) {
+			} else if (ocrData.getCheckResult() != null) {
 				mailConf.body = mailConf.body + "\n<OCR読取り結果>\n" + ocrData.getCheckResult() + "\n";
 			}
 		} else {
-			if (ocrData.getRenkeiResult().equals("") != true) {
+			if (ocrData.getRenkeiResult() != null) {
 				mailConf.body = mailConf.body + "\n<OCR読取り結果>\n"
 											  + readValue + "\n"
 											  + ocrData.getRenkeiResult() + "\n";
-			} else if (ocrData.getCheckResult().equals("") != true) {
+			} else if (ocrData.getCheckResult() != null) {
 				mailConf.body = mailConf.body + "\n<OCR読取り結果>\n"
 											  + readValue + "\n"
 											  + ocrData.getCheckResult() + "\n";
