@@ -2,7 +2,6 @@ package common.ocr;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -21,18 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import common.fax.FaxDataDAO;
 import common.fax.FaxScanFile;
-import common.po.PoScanFile;
 import common.utils.MyExcel;
 import common.utils.MyFiles;
 import common.utils.MyUtils;
 import common.utils.WebApi;
 
 public class OcrProcess {
-
-	static boolean ocrExlusiveFlag;
-	static FaxScanFile scan1;
+	static InsourcingConfig config;
 	static FaxScanFile scan2;
-	static PoScanFile scan3;
 	static String PROXY_HOST;
 	static String PROXY_PORT;
 	static String PROXY_USER;
@@ -61,11 +56,11 @@ public class OcrProcess {
 	static String SCAN_CLASS2;
 	static String SCAN_TARGET_PATH1;
 	static String SCAN_TARGET_PATH2;
-	static InsourcingConfig config;
 
-	public OcrProcess(InsourcingConfig arg_config) {
-		ocrExlusiveFlag = false;
+	public OcrProcess(InsourcingConfig arg_config, FaxScanFile arg_scan) {
+    	MyUtils.SystemLogPrint("■OcrProcessコンストラクタ");
 		config = arg_config;
+		scan2 = arg_scan;
 		PROXY_HOST = config.getProxyHost();
 		PROXY_PORT = config.getProxyPort();
 		PROXY_USER = config.getProxyUsername();
@@ -97,50 +92,6 @@ public class OcrProcess {
 		SCAN_TARGET_PATH2 = config.getScanPath2();
 		
 		CURRENT_PATH = MyFiles.getCurrentPath();	//カレントパス取得
-	}
-	
-	public static void main(String[] args) {
-		run(null);
-    }
-	
-	public static void run(InsourcingConfig config) {
-		OcrProcess process = new OcrProcess(config);
-    	scan1 = new FaxScanFile(config, SCAN_CLASS1); 
-		new Thread(scan1).start();
-    	scan2 = new FaxScanFile(config, SCAN_CLASS2); 
-		//new Thread(scan2).start();
-    	scan3 = new PoScanFile(config); 
-		//new Thread(scan3).start();
-    	MyUtils.SystemLogPrint("■OcrProcess: start...");
-        Timer timer = new Timer(); // 今回追加する処理
-        ocrExlusiveFlag = false;
-        TimerTask task = new TimerTask() {
-            int count = 0;
-            public void run() {
-            // 定期的に実行したい処理
-            count++;
-            //MyUtils.SystemLogPrint(count + "回目のタスクが実行されました。");
-            if (ocrExlusiveFlag == true ) {
-            	MyUtils.SystemLogPrint("wait...");
-            	return;
-            }
-            ocrExlusiveFlag = true;
-            process.pollingReadingUnit();
-            ocrExlusiveFlag = false;
-            //---------------------------------
-            //watchdog 書き込み処理
-            try {
-            	File file = new File(".\\data\\watchdog.dat");
-            	FileWriter filewriter = new FileWriter(file);
-            	filewriter.write(MyUtils.sdf.format(new Date())+"\n");
-            	filewriter.write(count+"\n");
-            	filewriter.close();
-        	} catch (IOException e){
-        		MyUtils.SystemErrPrint(e.toString());
-        	}                
-            //---------------------------------
-    	}};
-        timer.schedule(task, 0, 30000); // 30000ms間隔
 	}
 	
 	//---------------------------------
@@ -342,7 +293,7 @@ public class OcrProcess {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			api.setResponseJson(mapper.readTree(api.getResponseStr()));
-
+			
 			String status = api.getResponseJson().get("status").asText();;
 			int errorCode = api.getResponseJson().get("errorCode").asInt();;
 			String message = api.getResponseJson().get("message").asText();;
@@ -356,7 +307,7 @@ public class OcrProcess {
 				ocrData.setStatus("COMPLETE");
 				ocrData.setCreatedAt(MyUtils.sdf.format(new Date()));	 //yyyy/MM/dd HH:mm:ss           
 				OcrDataFormDAO.getInstance(config).updateWithUploadFile(ocrData);
-
+				
 				return -1;
 			}
 		
@@ -414,12 +365,11 @@ public class OcrProcess {
 		//---------------------------------------
 		//HTTP request process
 		//---------------------------------------
-		int res;
+		int res = -1;
 		try {
 			res = api.sendRequest();
 		} catch (Exception e) {
 			e.printStackTrace();
-			res = -1;
 		}
 
 		//---------------------------------------
@@ -463,7 +413,7 @@ public class OcrProcess {
 			createdAt = createdAt.substring(0, createdAt.length()-2);	//語尾の.0(2桁)をとる(yyyy-MM-dd HH:mm:ss)
 			createdAt = createdAt.replace("-", "/");				//(yyyy-MM-dd HH:mm:ss) → (yyyy/MM/dd HH:mm:ss)
 			String linkUrl = OCR_HOST_URL + String.format(OCR_LINK_ENTRY, docsetId, documentId);	//Entry画面へのリンク
-
+			
 			if (sortFlag == true) {
 				//２の場合、documentNameが入っていないのでここに入れる
 				ocrData.unitName = documentName;		//仕分け結果を入れる。
@@ -522,7 +472,7 @@ public class OcrProcess {
 	        MyUtils.SystemErrPrint("HTTP Connection Failed " + res);
 	        return -1;
         } 
-
+        
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			api.setResponseJson(mapper.readTree(api.getResponseStr()));

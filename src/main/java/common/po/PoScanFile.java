@@ -25,12 +25,8 @@ public class PoScanFile implements Runnable {
 	String scanPath;
 	InsourcingConfig config;
 
-	public PoScanFile(String argScanPath) {
-		//config = argConfig;
-		this.scanPath = argScanPath;
-	}
-	
 	public PoScanFile(InsourcingConfig argConfig) {
+		MyUtils.SystemLogPrint("■PoScanFileコンストラクタ");
 		config = argConfig;
 		this.scanPath = config.getOcrUploadPath();
 	}

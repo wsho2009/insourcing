@@ -40,6 +40,7 @@ public class FaxScanFile implements Runnable {
 	static MyMail mailConf;
 
 	public FaxScanFile(InsourcingConfig argConfig, String argKyoten) {
+		MyUtils.SystemLogPrint("■FaxScanFileコンストラクタ: " + argKyoten);
 		config = argConfig;
 		this.kyoten = argKyoten;
 
