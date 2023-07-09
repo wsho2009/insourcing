@@ -145,6 +145,8 @@ public class OcrProcess {
 			ocrDataForm.targetPath = SCAN_TARGET_PATH1;
 		} else if (ocrDataForm.docsetName.equals(SCAN_CLASS2)==true) {
 			ocrDataForm.targetPath = SCAN_TARGET_PATH2;
+		} else {	//暫定
+			ocrDataForm.targetPath = SCAN_TARGET_PATH2;
 		}
 	}
 
@@ -260,12 +262,8 @@ public class OcrProcess {
 		api.setProxy(PROXY_HOST, PROXY_PORT, PROXY_USER, PROXY_PASSWORD);
 		api.putRequestHeader(OCR_API_KEY, OCR_API_KEY_VALUE);
 		//---------------------------------------
-		api.getFormData().userId = OCR_USER_ID;
-		api.getFormData().sorterRuleId = ocrData.documentId;	//sorterRuleId;
-		api.getFormData().runSortingFlag = "true";
-		api.getFormData().sendOcrFlag = "true";
-		api.getFormData().file = ocrData.uploadFilePath;
 		WebApi.FormData formData = new WebApi.FormData();
+		formData.userId = OCR_USER_ID;
 		formData.sorterRuleId = ocrData.documentId;	//sorterRuleId;
 		formData.runSortingFlag = "true";
 		formData.sendOcrFlag = "true";

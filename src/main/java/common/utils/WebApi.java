@@ -144,14 +144,14 @@ public class WebApi {
 	    	    System.out.println("form-data: documentId: " + this.formData.documentId);
     	    } else {
 	    	    request.writeBytes("--" + boundary + CRLF);
-	    	    request.writeBytes("Content-Disposition: form-data; name=\"sorterRuleId\"" + CRLF + CRLF + this.getFormData().sorterRuleId + CRLF);
-	    	    System.out.println("form-data: sorterRuleId: " + this.getFormData().sorterRuleId);
+	    	    request.writeBytes("Content-Disposition: form-data; name=\"sorterRuleId\"" + CRLF + CRLF + this.formData.sorterRuleId + CRLF);
+	    	    System.out.println("form-data: sorterRuleId: " + this.formData.sorterRuleId);
 	    	    request.writeBytes("--" + boundary + CRLF);
-	    	    request.writeBytes("Content-Disposition: form-data; name=\"runSortingFlag\"" + CRLF + CRLF + this.getFormData().runSortingFlag + CRLF);
-	    	    System.out.println("form-data: Disposition: " + this.getFormData().runSortingFlag);
+	    	    request.writeBytes("Content-Disposition: form-data; name=\"runSortingFlag\"" + CRLF + CRLF + this.formData.runSortingFlag + CRLF);
+	    	    System.out.println("form-data: Disposition: " + this.formData.runSortingFlag);
 	    	    request.writeBytes("--" + boundary + CRLF);
-	    	    request.writeBytes("Content-Disposition: form-data; name=\"sendOcrFlag\"" + CRLF + CRLF + this.getFormData().sendOcrFlag + CRLF);
-	    	    System.out.println("form-data: sendOcrFlag: " + this.getFormData().sendOcrFlag);
+	    	    request.writeBytes("Content-Disposition: form-data; name=\"sendOcrFlag\"" + CRLF + CRLF + this.formData.sendOcrFlag + CRLF);
+	    	    System.out.println("form-data: sendOcrFlag: " + this.formData.sendOcrFlag);
     	    }
     	    request.writeBytes("--" + boundary + CRLF);
             request.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"" + CRLF + CRLF);

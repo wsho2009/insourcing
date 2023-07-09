@@ -193,7 +193,7 @@ public class OcrRirekiDAO {
 
 	public int queryCountRirekiHinmei(String formName, int colHinmei, String hinmei) throws SQLException {
 		int count = -1;
-		String sql = "select count(*) from ocrRirekiTable where COL1=? and COL" + colHinmei + "=?";
+		String sql = "select count(*) from ocrRirekiTable where COL1=? and COL" + (colHinmei+3) + "=?";	//COLの時は、+3する。
 		
 		//接続処理
 		Connection conn = null;
