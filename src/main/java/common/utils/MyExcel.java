@@ -172,10 +172,13 @@ public class MyExcel {
 				} 
 			} else if (ctype == CellType.NUMERIC) {
 				strValue = String.valueOf(cell.getNumericCellValue());
-				strValue = strValue.trim();	//前後に空白が入っていたら除去
+				strValue = strValue.trim();		//前後に空白が入っていたら除去
 			}
 			if (strValue.equals(target) == true) {
 				match = true;
+				cell = row2.getCell(3);			//引き当て対象の列設定
+				strValue = cell.getStringCellValue();
+				strValue = strValue.trim();		//前後に空白が入っていたら除去
 				break;
 			}
 			row = row2;

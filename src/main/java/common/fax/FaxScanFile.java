@@ -180,7 +180,7 @@ public class FaxScanFile implements Runnable {
 			//------------------------------------------------------
 			//FAX送信元 検索
 			xlsx.setSheet("マスタ");
-			soshinMoto = xlsx.search(2, listfaxNo);	//結果をrowにセット。マッチしなければ最下行をセット。
+			soshinMoto = xlsx.search(2, faxNo);	//結果をrowにセット。マッチしなければ最下行をセット。
 			MyUtils.SystemLogPrint("FAX番号から引き当てた送信元: " + soshinMoto);
 			xlsx.getCell(6);			//G列
 			mailConf.toAddr = xlsx.getStringCellValue();
