@@ -285,6 +285,13 @@ public class OcrProcess {
 		//---------------------------------------
         if (res != HttpURLConnection.HTTP_OK) {
 	        MyUtils.SystemErrPrint("HTTP Connection Failed " + res);
+			if (res == 400) {
+				//仕分け不可
+				ocrData.setUnitName("仕分け不可");
+				ocrData.setStatus("COMPLETE");
+				ocrData.setCreatedAt(MyUtils.sdf.format(new Date()));	//yyyy/MM/dd HH:mm:ss
+				return -1;	
+			}
 	        return -1;
         } 
         
@@ -843,14 +850,11 @@ public class OcrProcess {
 							arrList.add(list.get(r).get(c));
 						}
 						//明細データ
-						maxCol = list.get(r).size();
 						for (int c=0; c<meisaiNum; c++) {
-							c2 = c + headerNum + p*meisaiNum;
-							if (c2 < maxCol) {
-								str = list.get(r).get(c2);
-							} else {
-								str = "";
-							}
+							if ((list.get(r).size()-1) >= (c + headerNum + p*meisaiNum)) //暫定：スキップ
+								str = list.get(r).get(c + headerNum + p*meisaiNum);
+							else
+								str = "";	//CSVパースでlistに追加できなかったので、ブランク設定
 							arrList.add(str);
 						}
 						cnvList.add(arrList);
@@ -1448,8 +1452,8 @@ public class OcrProcess {
 		}
 		
 		//不要になったターゲットフォルダは削除	https://codechacha.com/ja/java-delete-files-recursively/
-		//File rootDir = new File(outputFolderPath);
-        //deleteFilesRecursively(rootDir);
+		File rootDir = new File(outputFolderPath);
+        deleteFilesRecursively(rootDir);
         
         MyUtils.SystemLogPrint("■postOcrProcess: end");
 	}
