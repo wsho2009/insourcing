@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers("/").permitAll()	//ログインなしでもアクセス可能URL
                 .requestMatchers("/fax").permitAll()
+                .requestMatchers("/fax/delete").permitAll()
                 .requestMatchers("/ocr/list").permitAll()
                 .requestMatchers("/ocr/result").permitAll()
                 .requestMatchers("/daicho").permitAll()

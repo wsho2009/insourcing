@@ -64,6 +64,9 @@ public class MyMail {
             // 基本情報
             message.setFrom(new InternetAddress(this.fmAddr));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(this.toAddr, false));
+            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(this.ccAddr, false));
+            message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(this.bccAddr, false));
+
             // タイトル
             message.setSubject(this.subject);
 

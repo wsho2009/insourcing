@@ -36,7 +36,7 @@ public class InsourcingApplication implements CommandLineRunner {
     	scan1 = new FaxScanFile(config, config.getScanDefTgt1()); 
     	new Thread(scan1).start();
 		scan2 = new FaxScanFile(config, config.getScanDefTgt2()); 
-		//new Thread(scan2).start();
+		new Thread(scan2).start();
 		scan3 = new PoScanFile(config); 
 		//new Thread(scan3).start();
 		OcrProcess process = new OcrProcess(config, scan2);

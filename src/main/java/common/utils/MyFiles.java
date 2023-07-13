@@ -3,6 +3,8 @@ package common.utils;
 import static java.nio.file.StandardCopyOption.*;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -157,5 +159,32 @@ public class MyFiles {
 		Path p2 = p1.toAbsolutePath();
 
 		return p2.toString();
+    }
+    
+    //テキストファイルから文字列を読み込む
+	public static String readAllText(String sqlPath) throws IOException {
+		String text = "";
+		Path path = Paths.get(sqlPath);
+		ArrayList<String> lines = (ArrayList<String>)Files.readAllLines(path);
+		for (String str : lines) {
+			text = text + str;
+		}
+		return text;
+	}
+	
+	//List<String>を新規作成したファイルに書き込む。
+    public static int WriteList2File(ArrayList<String> list, String writePath) throws IOException {
+		File file = new File(writePath);
+		FileWriter filewriter = new FileWriter(file);
+    	
+		String line;
+		//データ
+		for (int i=0; i<list.size(); i++) {
+			line = list.get(i);
+  			filewriter.write(line);
+		}
+		filewriter.close();
+		
+    	return 0;
     }
 }

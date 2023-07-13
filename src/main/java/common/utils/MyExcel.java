@@ -32,16 +32,22 @@ public class MyExcel {
 			return true;
 	}
 
-	public void openXlsm(String xlsPath, String sheetName) throws IOException {
-		book = WorkbookFactory.create(new File(xlsPath));
+	public void openXlsm(String xlsPath, boolean readOnly) throws IOException {
+		if (readOnly == true) 
+			book = WorkbookFactory.create(new File(xlsPath), null, true);
+		else
+			book = WorkbookFactory.create(new File(xlsPath));
 	}
 
-	public void open(String xlsPath, String sheetName) throws IOException {
+	public void open(String xlsPath, String sheetName, boolean readOnly) throws IOException {
 		//拡張子は、xlsxのみ
 		//Workbook book = WorkbookFactory.create(new File(xlsPath));	//使えない？
 		//既存ファイルのオープン
 		try {
-			book = new XSSFWorkbook(new File(xlsPath));
+			if (readOnly == true) 
+				book = WorkbookFactory.create(new File(xlsPath), null, true);
+			else
+				book = new XSSFWorkbook(new File(xlsPath));
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		}
@@ -164,34 +170,31 @@ public class MyExcel {
 		for (Row row2 : this.sheet) {
 			strValue = "";
 			cell = row2.getCell(colIdx);	//マッチング対象列を設定
-			ctype = cell.getCellType();
-			if (ctype == CellType.STRING) {
-				if (cell.getStringCellValue() != null) {
+			if (cell != null) {
+				ctype = cell.getCellType();
+				if (ctype == CellType.STRING) {
+					if (cell.getStringCellValue() != null) {
+						strValue = cell.getStringCellValue();
+						strValue = strValue.trim();	//前後に空白が入っていたら除去
+					} 
+				} else if (ctype == CellType.NUMERIC) {
+					strValue = String.valueOf(cell.getNumericCellValue());
+					strValue = strValue.trim();		//前後に空白が入っていたら除去
+				}
+				if (strValue.equals(target) == true) {
+					match = true;
+					row = row2;
+					cell = row.getCell(3);			//マッチング対象列を設定
 					strValue = cell.getStringCellValue();
-					strValue = strValue.trim();	//前後に空白が入っていたら除去
-				} 
-			} else if (ctype == CellType.NUMERIC) {
-				strValue = String.valueOf(cell.getNumericCellValue());
-				strValue = strValue.trim();		//前後に空白が入っていたら除去
-			}
-			if (strValue.equals(target) == true) {
-				match = true;
-				cell = row2.getCell(3);			//マッチング対象列を設定
-				strValue = cell.getStringCellValue();
-				strValue = strValue.trim();				//前後に空白が入っていたら除去
-				break;
+					strValue = strValue.trim();				//前後に空白が入っていたら除去
+					break;
+				}
 			}
 			row = row2;
 		} //for
 		//matchなし(最下行)
 		if (match == false) {
 			cell = row.getCell(colIdx);		//マッチング対象列を設定
-			if (cell.getStringCellValue() != null) {
-				strValue = cell.getStringCellValue();
-				strValue = strValue.trim();	//前後に空白が入っていたら除去
-			} else {
-				strValue = "";
-			}
 			strValue = "00送信元なし";		//固定設定
 		}
 		

@@ -51,8 +51,12 @@ public class WebApi {
     	
     	public String file;
     }
-    FormData formData = new WebApi.FormData();	//for Upload
+    //FormData formData = new WebApi.FormData();	//for Upload
+    FormData formData;
     
+    public WebApi() {
+	}
+
 	public FormData getFormData() {return formData;}
 	public String getResponseStr() {return this.responseStr;}
 	public JsonNode getResponseJson() {return this.responseJson;}
@@ -61,9 +65,6 @@ public class WebApi {
 		this.formData = formData;
 	}
 	
-    public WebApi() {
-	}
-
 	public void setUrl(String url) {
     	this.url = url;
 	}
@@ -116,7 +117,7 @@ public class WebApi {
                     }
                 });
     		}
-
+    		
 			//this.url = "http://httpbin.org/post";	//for upload debug
     	    con = (HttpURLConnection) new URL(this.url).openConnection();
     	    con.setRequestMethod("POST");

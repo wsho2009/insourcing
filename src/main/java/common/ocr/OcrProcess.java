@@ -141,7 +141,9 @@ public class OcrProcess {
 	}
 
 	private void setTargetPath(OcrDataFormBean ocrDataForm) {
-		if (ocrDataForm.docsetName.equals(SCAN_CLASS1)==true) {
+		if (ocrDataForm.docsetName == null)	//暫定
+			ocrDataForm.targetPath = SCAN_TARGET_PATH2;
+		else if (ocrDataForm.docsetName.equals(SCAN_CLASS1)==true) {
 			ocrDataForm.targetPath = SCAN_TARGET_PATH1;
 		} else if (ocrDataForm.docsetName.equals(SCAN_CLASS2)==true) {
 			ocrDataForm.targetPath = SCAN_TARGET_PATH2;
@@ -878,7 +880,7 @@ public class OcrProcess {
 			MyUtils.SystemLogPrint("  Excelオープン...: " + repXlsPath + " 定義名: " + documentName);
 			try {
 				MyExcel xlsx = new MyExcel();
-				xlsx.open(repXlsPath, documentName);
+				xlsx.open(repXlsPath, documentName, true);
 				if (xlsx.sheetExist()) {
 					CellType ctype;
 					str = "";
@@ -990,7 +992,7 @@ public class OcrProcess {
 			MyUtils.SystemLogPrint("  Excelオープン...: " + tmpXlsPath + " 定義名: " + documentName);
 			try {
 				MyExcel xlsx = new MyExcel();
-				xlsx.open(tmpXlsPath, null);	//1シート目
+				xlsx.open(tmpXlsPath, null, false);	//1シート目
 		        boolean resultFlag;
 		        String resultMsg;
 				String renkeiMsg = "";

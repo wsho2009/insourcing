@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-//import java.util.ResourceBundle;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,16 +14,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import common.utils.MyUtils;
 
 public class FaxDeleteFile {
-	static String targetPath;
-	static int daysOfDeletion;
-	static String backupPath;
-	static long deleteCount;
-	static long totalCount;
-	static long deleteSize;
-	static long totalSize;
-	static int mbSize;
+	String targetPath;
+	int daysOfDeletion;
+	String backupPath;
+	long deleteCount;
+	long totalCount;
+	long deleteSize;
+	long totalSize;
+	int mbSize;
 	
-	public FaxDeleteFile() {
+	public FaxDeleteFile(String argPath) {
+		targetPath = argPath;
 		daysOfDeletion = 60;	//日
 		backupPath = "\\backup";
 		deleteCount = 0;
@@ -34,14 +34,15 @@ public class FaxDeleteFile {
 		mbSize = 0;
 	}
 	
-	public static void main(String[] args) {
-		if (args.length > 0) {
-			targetPath = args[0];
-		} else {
-			MyUtils.SystemErrPrint("対象フォルダを指定してください。");
-			return; 
-		}
-		FaxDeleteFile delete = new FaxDeleteFile();
+	//public static void main(String[] args) {
+	public void run() {
+		//if (args.length > 0) {
+		//	targetPath = args[0];
+		//} else {
+		//	MyUtils.SystemErrPrint("対象フォルダを指定してください。");
+		//	return; 
+		//}
+		//FaxDeleteFile delete = new FaxDeleteFile();
 		
 		MyUtils.SystemLogPrint("「" + targetPath + "」フォルダ内のファイル更新日が"
 							+ daysOfDeletion + "日以上のものを削除します。");
@@ -77,21 +78,21 @@ public class FaxDeleteFile {
 		}                
 	}
 
-	private static void scanDeleteFile(String targetPath, String backupPath, boolean deleteFlag) {
+	private void scanDeleteFile(String targetPath, String backupPath, boolean deleteFlag) {
 		//指定ディレクトリ肺のファイルのみ(またはディレクトリのみ)を取得
-        File file1 = new File(targetPath);
-        File fileArray1[] = file1.listFiles();
+        File file = new File(targetPath);
+        File fileArray[] = file.listFiles();
         
-        for (File f: fileArray1){
+        for (File f: fileArray) {
             // フォルダ
-            if(f.isDirectory()) {
+            if (f.isDirectory()) {
                 MyUtils.SystemLogPrint(f.toString());//フォルダを表示
                 scanDeleteFile(f.toString(), backupPath, true);
             }
             
             // ファイル
-            if(f.isFile()) {
-                MyUtils.SystemLogPrint(f.toString());//ファイルを表示
+            if (f.isFile()) {
+                //MyUtils.SystemLogPrint(f.toString());//ファイルを表示
                 String fileName = f.toString();
                 String extension = fileName.substring(fileName.length()-3);	//拡張子：後ろから3文字
                 if (extension.equals("pdf") == true) {
@@ -112,6 +113,11 @@ public class FaxDeleteFile {
                         	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                             String update_time = simpleDateFormat.format(koushin);
                             MyUtils.SystemLogPrint(update_time+"： " + fileName);
+                            //try {
+                            //	MyFiles.delete(fileName);
+                            //} catch (IOException e) {
+                            //	e.printStackTrace();
+                            //}
                         }   
                     }
                 }

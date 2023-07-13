@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import common.fax.FaxDataBean;
 import common.fax.FaxDataDAO;
+import common.fax.FaxDeleteFile;
 import common.ocr.OcrColmunsBean;
 import common.ocr.OcrDaichoBean;
 import common.ocr.OcrDataFormBean;
@@ -570,6 +571,17 @@ public class InsourcingController {
 		return "daicholist";
     }
 	
+    //curl -X POST http://localhost/fax/delete
+    @RequestMapping(value = "/fax/delete", method = RequestMethod.POST)
+    public String faxDeletePost() {
+		
+    	String scanPath = config.getScanPath2();
+    	FaxDeleteFile delete = new FaxDeleteFile(scanPath);
+    	delete.run();
+    	
+    	return "post_ok";
+    }
+    
     @RequestMapping(value="/api/daicho", method = RequestMethod.GET)
     public void apiDaicho(HttpServletResponse response){
 		ArrayList<OcrDaichoBean> list;

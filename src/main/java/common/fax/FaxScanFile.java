@@ -159,12 +159,11 @@ public class FaxScanFile implements Runnable {
 		//2 Excelオープン
     	try {
 			CellType ctype;
-			String listfaxNo = "";
 			
 			// Excelファイルへアクセス(eclipse上でパスをしていないとプロジェクトパスになる)
 			String xlsPath = this.targetPath + this.kyoten + "-pdf管理表.xlsm";
 			MyExcel xlsx = new MyExcel();
-			xlsx.open(xlsPath, null);
+			xlsx.openXlsm(xlsPath, true);
 			MyUtils.SystemLogPrint("  Excelオープン..." + xlsPath);
 			// シートを取得
 			xlsx.setSheet("MAIL");
@@ -197,7 +196,7 @@ public class FaxScanFile implements Runnable {
 			xlsx.getCell(1);			//B列:種別
 			syubetsu = xlsx.getStringCellValue();
 			//------------------------------------------------------
-			if (faxNo == "なし") faxNo = "";	//表示は空白
+			if (faxNo == "送信元なし") faxNo = "";	//表示は空白
 			xlsx.close();
     	} catch (Throwable t) {
     	    //LOG.error("Failure during static initialization", t);
@@ -244,9 +243,9 @@ public class FaxScanFile implements Runnable {
 			return;
 		}
 		//注文書以外、番号登録ありは、この時点でメール送信
-    	if( syubetsu.equals("注文書") != true && faxNo.equals("") != true) {
+    	if( syubetsu.equals("注文書") != true && faxNo.equals("") != true && soshinMoto.equals("00送信元なし") != true) {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			mailConf.subject = "TEST " + this.kyoten + "送信連絡" + "("+ dateFormat.format(new Date()) + " " + soshinMoto + ")";
+			mailConf.subject = this.kyoten + "受信連絡" + "("+ dateFormat.format(new Date()) + " " + soshinMoto + ")";
 			mailConf.attach = dstPath;
 			sendScanMail(this.kyoten);
 			
@@ -363,7 +362,7 @@ public class FaxScanFile implements Runnable {
 			// Excelファイルへアクセス(eclipse上でパスをしていないとプロジェクトパスになる)
 			String xlsPath = ocrData.getTargetPath() + ocrData.getDocSetName() + "-pdf管理表.xlsm";
 			MyExcel xlsx = new MyExcel();
-			xlsx.openXlsm(xlsPath, null);
+			xlsx.openXlsm(xlsPath, true);	//read only
 			MyUtils.SystemLogPrint("  Excelオープン..." + xlsPath);
 			// シートを取得
 			xlsx.setSheet("MAIL");
@@ -402,7 +401,7 @@ public class FaxScanFile implements Runnable {
     	}
 
 		//パターン①: 注文書のケース
-		mailConf.subject = "TEST " + ocrData.getDocSetName() + "送信連絡" + "(" + ocrData.getCreatedAt() + " " + ocrData.getUnitName() + ")";
+		mailConf.subject = ocrData.getDocSetName() + "受信連絡" + "(" + ocrData.getCreatedAt() + " " + ocrData.getUnitName() + ")";
 		mailConf.attach = pdfPath;
 		if (ocrData.getRenkeiResult().equals("") != true) {
 			mailConf.body = mailConf.body + "\n<OCR読取り結果>\n" + ocrData.getRenkeiResult();
@@ -434,7 +433,7 @@ public class FaxScanFile implements Runnable {
 			// Excelファイルへアクセス(eclipse上でパスをしていないとプロジェクトパスになる)
 			String xlsPath = ocrData.getTargetPath() + ocrData.getDocSetName() + "-pdf管理表.xlsm";
 			MyExcel xlsx = new MyExcel();
-			xlsx.openXlsm(xlsPath, null);
+			xlsx.openXlsm(xlsPath, true);	//read only
 			MyUtils.SystemLogPrint("  Excelオープン..." + xlsPath);
 			// シートを取得
 			xlsx.setSheet("MAIL");
@@ -474,7 +473,7 @@ public class FaxScanFile implements Runnable {
     	}
 
 		//パターン①: 仕分け後のケース
-		mailConf.subject = "TEST " + ocrData.getDocSetName() + "送信連絡" + "(" + ocrData.getCreatedAt() + " " + ocrData.getUnitName() + ")";
+		mailConf.subject = ocrData.getDocSetName() + "受信連絡" + "(" + ocrData.getCreatedAt() + " " + ocrData.getUnitName() + ")";
 		mailConf.attach = uploadFilePath;
 		if (readValue.equals("") == true) {
 			if (ocrData.getRenkeiResult() != null) {
@@ -507,7 +506,7 @@ public class FaxScanFile implements Runnable {
 		mailConf.bccAddr = "";
 		mailConf.fmAddr =  "";
 		
-		mailConf.subject = "TEST " + ocrData.getDocSetName() + "仕分けNG連絡" + "(" + ocrData.getCreatedAt() + ")";
+		mailConf.subject = ocrData.getDocSetName() + "仕分けNG連絡" + "(" + ocrData.getCreatedAt() + ")";
 		mailConf.body = "各位\n\nいつもお世話になっております。プログラムからの自動送信です。\n\n"
 					  + "ファイル: " + ocrData.getUploadFilePath() + "\n"
 					  + "\nOCR仕分け結果: " + ocrData.getUnitName() + "\n";
